@@ -1,0 +1,10 @@
+# Debug logs directory
+
+This directory stores WhatsApp and email automation debug files when DEBUG_ENABLED=true in .env
+
+Debug files are automatically generated here when errors occur:
+- `whatsapp_debug_<phone>_<tag>.html` - Full page HTML snapshots
+- `whatsapp_debug_<phone>_<tag>.png` - Screenshots
+
+These files are useful for troubleshooting but should not be committed to version control.
+See .gitignore to keep this directory clean.
