@@ -28,6 +28,10 @@ WA_DELAY_MAX = int(os.getenv("WHATSAPP_DELAY_MAX", "20"))
 TIMEOUT = int(os.getenv("WHATSAPP_TIMEOUT_MS", "120000"))
 PROFILE = BASE / "whatsapp_profile"
 
+# Debug Configuration
+DEBUG_ENABLED = os.getenv("DEBUG_ENABLED", "false").lower() == "true"
+DEBUG_OUTPUT_DIR = BASE / os.getenv("DEBUG_OUTPUT_DIR", "debug_logs")
+
 SUBJECT = os.getenv("EMAIL_SUBJECT", "Application for Cloud / DevOps Engineer Opportunities – Saurav Kumar")
 
 HEADERS = ["SL No.","HR Name","Contact No","Email Id","Company Name","Location","Remark",
@@ -61,9 +65,9 @@ def wa_body(company):
     company = st(company) or "your organization"
     return f"""Hello,
 
-I’m Saurav Kumar, a Cloud / DevOps professional. I’m currently exploring suitable Cloud / DevOps opportunities and wanted to share my profile for consideration at {company}.
+I'm Saurav Kumar, a Cloud / DevOps professional. I'm currently exploring suitable Cloud / DevOps opportunities and wanted to share my profile for consideration at {company}.
 
-I’ve attached my CV for your reference. If there is any relevant opening matching my experience, I would be grateful for an opportunity to discuss it.
+I've attached my CV for your reference. If there is any relevant opening matching my experience, I would be grateful for an opportunity to discuss it.
 
 Thank you.
 
@@ -119,12 +123,21 @@ def send_email(to,subject,body):
         smtp.starttls(); smtp.login(SMTP_USERNAME,SMTP_PASSWORD); smtp.send_message(msg)
 
 def debug(page,number,tag):
+    if not DEBUG_ENABLED:
+        return
+    
+    DEBUG_OUTPUT_DIR.mkdir(exist_ok=True)
     safe=re.sub(r"\D","",number) or "unknown"
-    try: page.screenshot(path=str(BASE/f"whatsapp_debug_{safe}_{tag}.png"))
-    except: pass
+    
+    try: 
+        page.screenshot(path=str(DEBUG_OUTPUT_DIR/f"whatsapp_debug_{safe}_{tag}.png"))
+    except: 
+        pass
+    
     try:
-        (BASE/f"whatsapp_debug_{safe}_{tag}.html").write_text(page.content(),encoding="utf-8")
-    except: pass
+        (DEBUG_OUTPUT_DIR/f"whatsapp_debug_{safe}_{tag}.html").write_text(page.content(),encoding="utf-8")
+    except: 
+        pass
 
 # WhatsApp Web renders two different Send buttons: one inside <footer> for the
 # typed message, and one inside the attachment preview overlay. They must never
